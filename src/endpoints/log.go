@@ -54,7 +54,7 @@ type LogsReturn struct {
 
 
 
-
+// Yeah, yeah, don't commit secrets. Its a local DB for now so I don't care
 const (
 	host = "localhost"
 	port = 5432
