@@ -152,5 +152,9 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 		Totals: totals,
 	}
 
+
+	// Enable CORS
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	json.NewEncoder(w).Encode(returnValue)
 }
