@@ -133,16 +133,14 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-
-
 	// TODO add pictures
 	for i := 0; i < len(logs); i++ {
 		log := &logs[i]
-		
+
 		log.Pictures = []string{}
 	}
 
-
+	// TODO Find if foreflight track is available
 
 	// Retrieve totals
 
@@ -155,7 +153,6 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 		Logs:   logs,
 		Totals: totals,
 	}
-
 
 	// Enable CORS
 	w.Header().Set("Access-Control-Allow-Origin", "*")
