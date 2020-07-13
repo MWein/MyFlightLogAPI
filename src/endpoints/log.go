@@ -93,6 +93,10 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var log Log
 		rows.Scan(&log.Id, &log.Date, &log.Type, &log.Ident, pq.Array(&log.Stops), &log.Night, &log.Instrument, &log.Sim_instrument, &log.Flight_sim, &log.Cross_country, &log.Instructor, &log.Dual, &log.Pic, &log.Total, &log.Takeoffs, &log.Landings, &log.Remarks)
+
+		// Remove timestamp from date
+		log.Date = log.Date[0:10]
+
 		logs = append(logs, log)
 	}
 
