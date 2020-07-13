@@ -7,7 +7,6 @@ import (
 )
 
 func PlaneImg(w http.ResponseWriter, r *http.Request) {
-
 	idents, ok := r.URL.Query()["ident"]
 
 	if !ok || len(idents[0]) < 1 {
@@ -20,7 +19,6 @@ func PlaneImg(w http.ResponseWriter, r *http.Request) {
 		host, port, user, password, dbname)
 
 	db, err := sql.Open("postgres", psqlInfo)
-
 	if err != nil {
 		panic(err)
 	}
@@ -35,6 +33,9 @@ func PlaneImg(w http.ResponseWriter, r *http.Request) {
 
 	var image []byte
 	err = db.QueryRow(planeImgStatement, idents[0]).Scan(&image)
+	if err != nil {
+		panic(err)
+	}
 
 	w.Header().Set("Content-Type", "image/jpeg")
 	w.Write(image)

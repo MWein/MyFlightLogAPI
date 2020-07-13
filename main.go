@@ -18,10 +18,6 @@ func otherPage(w http.ResponseWriter, r *http.Request) {
 
 
 func handleRequests() {
-	http.HandleFunc("/", homePage)
-	http.HandleFunc("/other", otherPage)
-
-	http.HandleFunc("/ping", endpoints.Ping)
 	http.HandleFunc("/log", endpoints.FlightLogs)
 	http.HandleFunc("/plane-image", endpoints.PlaneImg)
 
