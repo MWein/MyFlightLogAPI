@@ -6,11 +6,11 @@ import (
 	"net/http"
 )
 
-func PlaneImg(w http.ResponseWriter, r *http.Request) {
-	idents, ok := r.URL.Query()["ident"]
+func FlightImg(w http.ResponseWriter, r *http.Request) {
+	id, ok := r.URL.Query()["imgid"]
 
-	if !ok || len(idents[0]) < 1 {
-		fmt.Fprintf(w, "ident is required")
+	if !ok || len(id[0]) < 1 {
+		fmt.Fprintf(w, "Image ID is required")
 		return
 	}
 
@@ -30,7 +30,7 @@ func PlaneImg(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var image []byte
-	err = db.QueryRow("SELECT pic FROM plane WHERE ident = $1", idents[0]).Scan(&image)
+	err = db.QueryRow("SELECT data FROM pictures WHERE id = $1", id[0]).Scan(&image)
 	if err != nil {
 		fmt.Fprintf(w, "Not Found")
 		return
