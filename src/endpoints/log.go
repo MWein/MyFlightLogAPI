@@ -133,11 +133,20 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// TODO add pictures
 	for i := 0; i < len(logs); i++ {
 		log := &logs[i]
-
 		log.Pictures = []string{}
+
+		rows, err := db.Query("SELECT id FROM pictures WHERE flightid = $1", log.Id)
+		if err != nil {
+			continue
+		}
+
+		for rows.Next() {
+			var pic string
+			rows.Scan(&pic)
+			log.Pictures = append(log.Pictures, pic)
+		}
 	}
 
 	// TODO Find if foreflight track is available
