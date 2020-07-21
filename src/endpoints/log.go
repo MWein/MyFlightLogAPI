@@ -85,7 +85,8 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 	id, date, plane_type.name AS type, ident, stops, night, instrument, sim_instrument, flight_sim, cross_country, instructor, dual, log.pic, total, takeoffs, landings, remarks
 	FROM log
 	JOIN plane USING (ident)
-	JOIN plane_type USING (type_id)`
+	JOIN plane_type USING (type_id)
+	ORDER BY date DESC`
 
 	rows, err := db.Query(logsStatement)
 
