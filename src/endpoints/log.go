@@ -123,20 +123,17 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 		airportMap[ident] = latLon
 	}
 
-	// Generate geolocations and add to logs
 	for i := 0; i < len(logs); i++ {
 		log := &logs[i]
 		stops := log.Stops
+		log.Pictures = []string{}
 
+		// Generate geolocations and add to logs
 		for _, stop := range stops {
 			log.Geolocation = append(log.Geolocation, airportMap[stop])
 		}
-	}
 
-	for i := 0; i < len(logs); i++ {
-		log := &logs[i]
-		log.Pictures = []string{}
-
+		// Add picture IDs
 		rows, err := db.Query("SELECT id FROM pictures WHERE flightid = $1", log.Id)
 		if err != nil {
 			continue
@@ -147,9 +144,10 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 			rows.Scan(&pic)
 			log.Pictures = append(log.Pictures, pic)
 		}
-	}
 
-	// TODO Find if foreflight track is available
+		// Add boolean for Foreflight Track
+		err = db.QueryRow("SELECT count(*) > 0 FROM foreflight WHERE flightid = $1", log.Id).Scan(&log.HasFFTrack)
+	}
 
 	// Retrieve totals
 
