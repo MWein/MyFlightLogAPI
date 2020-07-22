@@ -1,11 +1,10 @@
 package endpoints
 
 import (
-	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
+	"github.com/MWein/MyFlightLogAPI/src/database"
 	"github.com/lib/pq"
 )
 
@@ -63,22 +62,6 @@ func arrayIncludes(a string, list []string) bool {
 }
 
 func FlightLogs(w http.ResponseWriter, r *http.Request) {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-
-	db, err := sql.Open("postgres", psqlInfo)
-
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-
 	// Retrieve main logs body
 
 	logsStatement := `SELECT
@@ -88,7 +71,7 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 	JOIN plane_type USING (type_id)
 	ORDER BY date DESC`
 
-	rows, err := db.Query(logsStatement)
+	rows, _ := database.DBConnection.Query(logsStatement)
 
 	var logs Logs
 	for rows.Next() {
@@ -113,7 +96,7 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 
 	// Generate airport map
 	geoLocationsStatement := `SELECT ident, lat, long FROM airport WHERE ident = ANY($1)`
-	rows, err = db.Query(geoLocationsStatement, pq.Array(airportCodes))
+	rows, _ = database.DBConnection.Query(geoLocationsStatement, pq.Array(airportCodes))
 
 	airportMap := make(map[string][2]float64)
 
@@ -135,7 +118,7 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Add picture IDs
-		rows, err := db.Query("SELECT id FROM pictures WHERE flightid = $1", log.Id)
+		rows, err := database.DBConnection.Query("SELECT id FROM pictures WHERE flightid = $1", log.Id)
 		if err != nil {
 			continue
 		}
@@ -147,7 +130,7 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Add boolean for Foreflight Track
-		err = db.QueryRow("SELECT count(*) > 0 FROM foreflight WHERE flightid = $1", log.Id).Scan(&log.HasFFTrack)
+		err = database.DBConnection.QueryRow("SELECT count(*) > 0 FROM foreflight WHERE flightid = $1", log.Id).Scan(&log.HasFFTrack)
 	}
 
 	// Retrieve totals
@@ -155,7 +138,7 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 	totalsStatement := `SELECT sum(takeoffs) AS takeoffs, sum(landings) AS landings, sum(night) AS night, sum(instrument) AS instrument, sum(sim_instrument) AS sim_instrument, sum(flight_sim) AS flight_sim, sum(cross_country) AS cross_country, sum(instructor) AS instructor, sum(dual) AS dual, sum(pic) AS pic, sum(total) AS total FROM log`
 
 	var totals Totals
-	err = db.QueryRow(totalsStatement).Scan(&totals.Takeoffs, &totals.Landings, &totals.Night, &totals.Instrument, &totals.SimInstrument, &totals.FlightSim, &totals.CrossCountry, &totals.Instructor, &totals.Dual, &totals.Pic, &totals.Total)
+	database.DBConnection.QueryRow(totalsStatement).Scan(&totals.Takeoffs, &totals.Landings, &totals.Night, &totals.Instrument, &totals.SimInstrument, &totals.FlightSim, &totals.CrossCountry, &totals.Instructor, &totals.Dual, &totals.Pic, &totals.Total)
 
 	returnValue := LogsReturn{
 		Logs:   logs,

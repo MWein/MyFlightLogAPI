@@ -1,10 +1,11 @@
 package endpoints
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/MWein/MyFlightLogAPI/src/database"
 )
 
 func ForeflightTrack(w http.ResponseWriter, r *http.Request) {
@@ -15,22 +16,7 @@ func ForeflightTrack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-
-	rows, err := db.Query("SELECT lat, long FROM foreflight WHERE flightid = $1 ORDER BY sequence", id[0])
+	rows, err := database.DBConnection.Query("SELECT lat, long FROM foreflight WHERE flightid = $1 ORDER BY sequence", id[0])
 	if err != nil {
 		fmt.Fprintf(w, "Not Found")
 		return

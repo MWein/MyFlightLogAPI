@@ -1,11 +1,13 @@
 package endpoints
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/MWein/MyFlightLogAPI/src/database"
 )
+
 
 func PlaneImg(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
@@ -17,35 +19,16 @@ func PlaneImg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	elapsed := time.Since(start)
-	fmt.Printf("Connection took %s\n", elapsed)
-
-	start = time.Now()
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-	elapsed = time.Since(start)
-	fmt.Printf("Ping took %s\n", elapsed)
-
 	start = time.Now()
 	var image []byte
-	err = db.QueryRow("SELECT pic FROM plane WHERE ident = $1", idents[0]).Scan(&image)
+	err := database.DBConnection.QueryRow("SELECT pic FROM plane WHERE ident = $1", idents[0]).Scan(&image)
 	if err != nil {
 		fmt.Fprintf(w, "Not Found")
+		fmt.Println(err)
 		return
 	}
-	elapsed = time.Since(start)
+
+	elapsed := time.Since(start)
 	fmt.Printf("Getting image took %s\n", elapsed)
 
 	w.Header().Set("Content-Type", "image/jpeg")

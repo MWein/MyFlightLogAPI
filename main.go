@@ -3,9 +3,10 @@ package main
 import (
 	"log"
 	"net/http"
+
+	"github.com/MWein/MyFlightLogAPI/src/database"
 	"github.com/MWein/MyFlightLogAPI/src/endpoints"
 )
-
 
 func handleRequests() {
 	http.HandleFunc("/log", endpoints.FlightLogs)
@@ -17,5 +18,7 @@ func handleRequests() {
 }
 
 func main() {
+	database.StartDB()
+
 	handleRequests()
 }
