@@ -28,7 +28,7 @@ func PlaneImg(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	elapsed := time.Since(start)
-	fmt.Printf("Connection took %s", elapsed)
+	fmt.Printf("Connection took %s\n", elapsed)
 
 	start = time.Now()
 	err = db.Ping()
@@ -36,7 +36,7 @@ func PlaneImg(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	elapsed = time.Since(start)
-	fmt.Printf("Ping took %s", elapsed)
+	fmt.Printf("Ping took %s\n", elapsed)
 
 	start = time.Now()
 	var image []byte
@@ -46,7 +46,7 @@ func PlaneImg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	elapsed = time.Since(start)
-	fmt.Printf("Getting image took %s", elapsed)
+	fmt.Printf("Getting image took %s\n", elapsed)
 
 	w.Header().Set("Content-Type", "image/jpeg")
 	w.Write(image)
