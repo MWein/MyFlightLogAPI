@@ -14,6 +14,7 @@ func handleRequests() {
 	http.HandleFunc("/flight-image", endpoints.FlightImg)
 	http.HandleFunc("/foreflight-track", endpoints.ForeflightTrack)
 	http.HandleFunc("/visited-airports", endpoints.VisitedAirports)
+	http.HandleFunc("/airplanes-flown", endpoints.AirplanesFlown)
 
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
