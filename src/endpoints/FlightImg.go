@@ -8,9 +8,6 @@ import (
 )
 
 func FlightImg(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(database.DBConnection)
-
-
 	id, ok := r.URL.Query()["imgid"]
 
 	if !ok || len(id[0]) < 1 {

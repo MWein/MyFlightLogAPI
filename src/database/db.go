@@ -8,8 +8,6 @@ import (
 var DBConnection *sql.DB
 
 func StartDB() {
-	fmt.Println(DBConnection)
-
 	// Spin up the database connection
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -27,6 +25,4 @@ func StartDB() {
 	}
 
 	fmt.Println("Database Ready")
-
-	fmt.Println(DBConnection)
 }
