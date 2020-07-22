@@ -23,7 +23,8 @@ func AirplanesFlown(w http.ResponseWriter, r *http.Request) {
 		(SELECT count(*) FROM log WHERE log.ident = plane.ident) AS flights,
 		(SELECT date FROM log WHERE log.ident = plane.ident ORDER BY date DESC LIMIT 1) AS last_flight
 	FROM plane
-	JOIN plane_type USING (type_id)`
+	JOIN plane_type USING (type_id)
+	ORDER BY last_flown DESC`
 
 	rows, _ := database.DBConnection.Query(planeQuery)
 
