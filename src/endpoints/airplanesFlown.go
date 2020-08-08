@@ -24,7 +24,7 @@ func AirplanesFlown(w http.ResponseWriter, r *http.Request) {
 		(SELECT date FROM log WHERE log.ident = plane.ident ORDER BY date DESC LIMIT 1) AS last_flight
 	FROM plane
 	JOIN plane_type USING (type_id)
-	ORDER BY last_flown DESC`
+	ORDER BY last_flight DESC`
 
 	rows, _ := database.DBConnection.Query(planeQuery)
 
