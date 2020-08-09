@@ -20,8 +20,8 @@ func BuildProjects(w http.ResponseWriter, r *http.Request) {
 	rows, _ := database.DBConnection.Query(`
 	SELECT
 		id, name,
-		(SELECT ROUND(sum(minutes) / 60, 2) FROM build_log WHERE phase_id = (SELECT id FROM build_phase WHERE build_id = build.id)) AS hours,
-		(SELECT date FROM build_log WHERE phase_id = (SELECT id FROM build_phase WHERE build_id = build.id) ORDER BY date DESC LIMIT 1) AS last_entry
+		(SELECT ROUND(sum(minutes) / 60, 2) FROM build_log WHERE phase_id = ANY (SELECT id FROM build_phase WHERE build_id = build.id)) AS hours,
+		(SELECT date FROM build_log WHERE phase_id = ANY (SELECT id FROM build_phase WHERE build_id = build.id) ORDER BY date DESC LIMIT 1) AS last_entry
 	FROM build`)
 
 	var projects Projects
