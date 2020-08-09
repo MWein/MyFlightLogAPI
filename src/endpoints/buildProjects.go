@@ -8,8 +8,10 @@ import (
 )
 
 type Project struct {
-	Id string  `json:"id"`
-	Name  string  `json:"name"`
+	Id        string  `json:"id"`
+	Name      string  `json:"name"`
+	Hours     float32 `json:"hours"`
+	LastEntry string  `json:"lastEntry"`
 }
 
 type Projects []Project
@@ -21,6 +23,10 @@ func BuildProjects(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var project Project
 		rows.Scan(&project.Id, &project.Name)
+
+		// Placeholder data
+		project.Hours = 140.15
+		project.LastEntry = "2020-01-03"
 
 		projects = append(projects, project)
 	}
