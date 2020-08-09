@@ -17,16 +17,17 @@ type Project struct {
 type Projects []Project
 
 func BuildProjects(w http.ResponseWriter, r *http.Request) {
-	rows, _ := database.DBConnection.Query("SELECT id, name FROM build")
+	rows, _ := database.DBConnection.Query(`
+	SELECT
+		id, name,
+		(SELECT ROUND(sum(minutes) / 60, 2) FROM build_log WHERE phase_id = (SELECT id FROM build_phase WHERE build_id = build.id)) AS hours,
+		(SELECT date FROM build_log WHERE phase_id = (SELECT id FROM build_phase WHERE build_id = build.id) ORDER BY date DESC LIMIT 1) AS last_entry
+	FROM build`)
 
 	var projects Projects
 	for rows.Next() {
 		var project Project
-		rows.Scan(&project.Id, &project.Name)
-
-		// Placeholder data
-		project.Hours = 140.15
-		project.LastEntry = "2020-01-03"
+		rows.Scan(&project.Id, &project.Name, &project.Hours, &project.LastEntry)
 
 		projects = append(projects, project)
 	}
