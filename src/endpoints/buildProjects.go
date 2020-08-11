@@ -13,7 +13,6 @@ type Project struct {
 	Hours     float32 `json:"hours"`
 	LastEntry string  `json:"lastEntry"`
 }
-
 type Projects []Project
 
 func BuildProjects(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +24,7 @@ func BuildProjects(w http.ResponseWriter, r *http.Request) {
 	FROM build
 	ORDER BY last_entry DESC`)
 
-	var projects Projects
+	projects := Projects{}
 	for rows.Next() {
 		var project Project
 		rows.Scan(&project.Id, &project.Name, &project.Hours, &project.LastEntry)
