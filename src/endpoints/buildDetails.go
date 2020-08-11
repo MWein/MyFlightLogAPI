@@ -8,43 +8,37 @@ import (
 	"github.com/MWein/MyFlightLogAPI/src/database"
 )
 
-
 type BuildEntry struct {
-	Date       string `json:"date"`
-	Minutes     int `json:"minutes"`
-	Rivets int   `json:"rivets"`
-	Description string  `json:"description"`
-	Pictures []string `json:"pictures"`
+	Title       string   `json:"title"`
+	Date        string   `json:"date"`
+	Minutes     int      `json:"minutes"`
+	Rivets      int      `json:"rivets"`
+	Description string   `json:"description"`
+	Pictures    []string `json:"pictures"`
 }
 type BuildEntries []BuildEntry
 
-
 type Expense struct {
-	Date       string `json:"date"`
-	Cost     float32 `json:"cost"`
-	Projected bool   `json:"projected"`
+	Date        string  `json:"date"`
+	Cost        float32 `json:"cost"`
+	Projected   bool    `json:"projected"`
 	Description string  `json:"description"`
 }
 type Expenses []Expense
 
-
 type Phase struct {
-	Id       string `json:"id"`
-	Name     string `json:"name"`
-	Complete bool   `json:"complete"`
-	Expenses Expenses  `json:"expenses"`
-	Entries BuildEntries  `json:"entries"`
+	Id       string       `json:"id"`
+	Name     string       `json:"name"`
+	Complete bool         `json:"complete"`
+	Expenses Expenses     `json:"expenses"`
+	Entries  BuildEntries `json:"entries"`
 }
 type Phases []Phase
 
-
 type Build struct {
-	Name string `json:"name"`
+	Name   string `json:"name"`
 	Phases Phases `json:"phases"`
 }
-
-
-
 
 func BuildDetails(w http.ResponseWriter, r *http.Request) {
 	buildId, ok := r.URL.Query()["buildid"]
@@ -54,14 +48,12 @@ func BuildDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	var build Build
 	err := database.DBConnection.QueryRow("SELECT name FROM build WHERE id = $1", buildId[0]).Scan(&build.Name)
-	if (err != nil) {
+	if err != nil {
 		fmt.Fprintf(w, "Not Found")
 		return
 	}
-
 
 	rows, _ := database.DBConnection.Query(`SELECT id, name, complete FROM build_phase WHERE build_id = $1`, buildId[0])
 	var phases Phases
@@ -70,11 +62,11 @@ func BuildDetails(w http.ResponseWriter, r *http.Request) {
 		rows.Scan(&phase.Id, &phase.Name, &phase.Complete)
 
 		// Get entries
-		rows, _ := database.DBConnection.Query(`SELECT date, minutes, rivets, description FROM build_log WHERE phase_id = $1`, phase.Id)
+		rows, _ := database.DBConnection.Query(`SELECT title, date, minutes, rivets, description FROM build_log WHERE phase_id = $1`, phase.Id)
 		phase.Entries = BuildEntries{}
 		for rows.Next() {
 			var entry BuildEntry
-			rows.Scan(&entry.Date, &entry.Minutes, &entry.Rivets, &entry.Description)
+			rows.Scan(&entry.Title, &entry.Date, &entry.Minutes, &entry.Rivets, &entry.Description)
 
 			// Remove timestamp from date
 			entry.Date = entry.Date[0:10]
@@ -91,9 +83,7 @@ func BuildDetails(w http.ResponseWriter, r *http.Request) {
 		phases = append(phases, phase)
 	}
 
-
 	build.Phases = phases
-
 
 	// Enable CORS
 	w.Header().Set("Access-Control-Allow-Origin", "*")
