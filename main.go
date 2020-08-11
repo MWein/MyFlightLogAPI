@@ -24,6 +24,7 @@ func handleRequests() {
 	// Build Log
 	http.HandleFunc("/build-projects", endpoints.BuildProjects)
 	http.HandleFunc("/build-cover", endpoints.BuildCoverPhoto)
+	http.HandleFunc("/build-details", endpoints.BuildDetails)
 
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
