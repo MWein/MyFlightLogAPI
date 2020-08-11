@@ -15,6 +15,7 @@ type BuildEntry struct {
 	Rivets      int      `json:"rivets"`
 	Description string   `json:"description"`
 	Pictures    []string `json:"pictures"`
+	Phase       string   `json:"phase"`
 }
 type BuildEntries []BuildEntry
 
@@ -62,11 +63,11 @@ func BuildDetails(w http.ResponseWriter, r *http.Request) {
 		rows.Scan(&phase.Id, &phase.Name, &phase.Complete)
 
 		// Get entries
-		rows, _ := database.DBConnection.Query(`SELECT title, date, minutes, rivets, description FROM build_log WHERE phase_id = $1`, phase.Id)
+		rows, _ := database.DBConnection.Query(`SELECT title, date, minutes, rivets, description, (SELECT name FROM build_phase WHERE id = $1) AS phase FROM build_log WHERE phase_id = $1`, phase.Id)
 		phase.Entries = BuildEntries{}
 		for rows.Next() {
 			var entry BuildEntry
-			rows.Scan(&entry.Title, &entry.Date, &entry.Minutes, &entry.Rivets, &entry.Description)
+			rows.Scan(&entry.Title, &entry.Date, &entry.Minutes, &entry.Rivets, &entry.Description, &entry.Phase)
 
 			// Remove timestamp from date
 			entry.Date = entry.Date[0:10]
