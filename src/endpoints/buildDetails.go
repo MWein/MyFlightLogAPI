@@ -63,7 +63,7 @@ func BuildDetails(w http.ResponseWriter, r *http.Request) {
 		rows.Scan(&phase.Id, &phase.Name, &phase.Complete)
 
 		// Get entries
-		rows, _ := database.DBConnection.Query(`SELECT title, date, minutes, rivets, description, (SELECT name FROM build_phase WHERE id = $1) AS phase FROM build_log WHERE phase_id = $1`, phase.Id)
+		rows, _ := database.DBConnection.Query(`SELECT title, date, minutes, rivets, description, (SELECT name FROM build_phase WHERE id = $1) AS phase FROM build_log WHERE phase_id = $1 ORDER BY date DESC`, phase.Id)
 		phase.Entries = BuildEntries{}
 		for rows.Next() {
 			var entry BuildEntry
