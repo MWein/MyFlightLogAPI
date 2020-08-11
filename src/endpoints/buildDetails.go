@@ -76,6 +76,9 @@ func BuildDetails(w http.ResponseWriter, r *http.Request) {
 			var entry BuildEntry
 			rows.Scan(&entry.Date, &entry.Minutes, &entry.Rivets, &entry.Description)
 
+			// Remove timestamp from date
+			entry.Date = entry.Date[0:10]
+
 			// TODO Get pictures
 			entry.Pictures = []string{}
 
