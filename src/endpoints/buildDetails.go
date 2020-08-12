@@ -57,7 +57,7 @@ func BuildDetails(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rows, _ := database.DBConnection.Query(`SELECT id, name, complete FROM build_phase WHERE build_id = $1`, buildId[0])
-	var phases Phases
+	phases := Phases{}
 	for rows.Next() {
 		var phase Phase
 		rows.Scan(&phase.Id, &phase.Name, &phase.Complete)
@@ -78,8 +78,18 @@ func BuildDetails(w http.ResponseWriter, r *http.Request) {
 			phase.Entries = append(phase.Entries, entry)
 		}
 
-		// TODO Get expenses
+		// Get expenses
+		rows, _ = database.DBConnection.Query(`SELECT description, date, cost, projected FROM build_expense WHERE phase_id = $1`, phase.Id)
 		phase.Expenses = Expenses{}
+		for rows.Next() {
+			var expense Expense
+			rows.Scan(&expense.Description, &expense.Date, &expense.Cost, &expense.Projected)
+
+			// Remove timestamp from date
+			expense.Date = expense.Date[0:10]
+
+			phase.Expenses = append(phase.Expenses, expense)
+		}
 
 		phases = append(phases, phase)
 	}
