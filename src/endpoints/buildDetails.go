@@ -86,7 +86,9 @@ func BuildDetails(w http.ResponseWriter, r *http.Request) {
 			rows.Scan(&expense.Description, &expense.Date, &expense.Cost, &expense.Projected)
 
 			// Remove timestamp from date
-			expense.Date = expense.Date[0:10]
+			if (expense.Date != "") {
+				expense.Date = expense.Date[0:10]
+			}
 
 			phase.Expenses = append(phase.Expenses, expense)
 		}
