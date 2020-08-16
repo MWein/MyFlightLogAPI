@@ -33,25 +33,6 @@ type Log struct {
 }
 type Logs []Log
 
-type Totals struct {
-	Takeoffs      int     `json:"takeoffs"`
-	Landings      int     `json:"landings"`
-	Night         float32 `json:"night"`
-	Instrument    float32 `json:"instrument"`
-	SimInstrument float32 `json:"simInstrument"`
-	FlightSim     float32 `json:"flightSim"`
-	CrossCountry  float32 `json:"crossCountry"`
-	Instructor    float32 `json:"instructor"`
-	Dual          float32 `json:"dual"`
-	Pic           float32 `json:"pic"`
-	Total         float32 `json:"total"`
-}
-
-type LogsReturn struct {
-	Logs   Logs   `json:"logs"`
-	Totals Totals `json:"totals"`
-}
-
 func arrayIncludes(a string, list []string) bool {
 	for _, item := range list {
 		if a == item {
@@ -134,20 +115,8 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 		err = database.DBConnection.QueryRow("SELECT count(*) > 0 FROM foreflight WHERE flightid = $1", log.Id).Scan(&log.HasFFTrack)
 	}
 
-	// Retrieve totals
-
-	totalsStatement := `SELECT sum(takeoffs) AS takeoffs, sum(landings) AS landings, sum(night) AS night, sum(instrument) AS instrument, sum(sim_instrument) AS sim_instrument, sum(flight_sim) AS flight_sim, sum(cross_country) AS cross_country, sum(instructor) AS instructor, sum(dual) AS dual, sum(pic) AS pic, sum(total) AS total FROM log`
-
-	var totals Totals
-	database.DBConnection.QueryRow(totalsStatement).Scan(&totals.Takeoffs, &totals.Landings, &totals.Night, &totals.Instrument, &totals.SimInstrument, &totals.FlightSim, &totals.CrossCountry, &totals.Instructor, &totals.Dual, &totals.Pic, &totals.Total)
-
-	returnValue := LogsReturn{
-		Logs:   logs,
-		Totals: totals,
-	}
-
 	// Enable CORS
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	json.NewEncoder(w).Encode(returnValue)
+	json.NewEncoder(w).Encode(logs)
 }
