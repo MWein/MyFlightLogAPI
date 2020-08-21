@@ -34,7 +34,9 @@ func AirplanesFlown(w http.ResponseWriter, r *http.Request) {
 		rows.Scan(&plane.Ident, &plane.Type, &plane.Flights, &plane.LastFlight)
 
 		// Remove timestamp from date
-		plane.LastFlight = plane.LastFlight[0:10]
+		if plane.LastFlight != "" {
+			plane.LastFlight = plane.LastFlight[0:10]
+		}
 
 		planes = append(planes, plane)
 	}
