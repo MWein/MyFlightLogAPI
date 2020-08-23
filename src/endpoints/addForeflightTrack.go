@@ -2,12 +2,12 @@ package endpoints
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"strconv"
 	"time"
-	"encoding/json"
 
 	"github.com/MWein/MyFlightLogAPI/src/database"
 	"github.com/MWein/MyFlightLogAPI/src/utils"
@@ -105,65 +105,6 @@ func AddForeflightTrack(w http.ResponseWriter, r *http.Request) {
 		flightId = flightIds[0]
 	}
 
-	fmt.Fprintf(w, "Beginning Save")
-
-	/*
-
-
-
-		THIS IS THE OLD WAY
-
-
-
-	*/
-	start := time.Now()
-
-	// Clean out any previous foreflight logs
-	database.DBConnection.Exec("DELETE FROM foreflight WHERE flightid = $1", flightId)
-
-	sequence := -1
-	for index, row := range data {
-		// Skip the first 3 lines, go right to the actual flight log data
-		if index <= 2 {
-			continue
-		}
-
-		lat, err := strconv.ParseFloat(row[1], 64)
-		if err != nil {
-			fmt.Println("Invalid latitude format. Skipping.")
-			continue
-		}
-
-		long, err := strconv.ParseFloat(row[2], 64)
-		if err != nil {
-			fmt.Println("Invalid longitude format. Skipping.")
-			continue
-		}
-
-		meters := utils.LatLong2Meters(lat, long)
-		sequence++
-
-		_, saveErr := database.DBConnection.Exec("INSERT INTO foreflight (flightid, sequence, lat, long) VALUES ($1, $2, $3, $4)", flightId, sequence, meters[0], meters[1])
-		if saveErr != nil {
-			fmt.Printf("Failed on %d", index)
-			continue
-		}
-	}
-
-	elapsed := time.Since(start)
-	fmt.Println("The old way took", elapsed)
-
-	/*
-
-
-
-		THIS IS THE (POTENTIAL) NEW WAY
-
-
-
-	*/
-	start = time.Now()
-
 	// Clean out any previous foreflight logs
 	database.DBConnection.Exec("DELETE FROM foreflight_test WHERE flightid = $1", flightId)
 
@@ -195,7 +136,5 @@ func AddForeflightTrack(w http.ResponseWriter, r *http.Request) {
 	foreflightTrackJSON, _ := json.Marshal(foreflightTrack)
 	database.DBConnection.Exec("INSERT INTO foreflight_test (flightid, data) VALUES ($1, $2)", flightId, foreflightTrackJSON)
 
-
-	elapsed = time.Since(start)
-	fmt.Println("The new way took", elapsed)
+	fmt.Fprintf(w, "Saved")
 }
