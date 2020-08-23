@@ -1,3 +1,4 @@
+github.com/Mwein/MyFlightLogAPI v0.0.0-20200821112812-d5e14cccca51 h1:S5Nj37Re5HHIq3FZa90EP/yjmhAJo4AmhAuHKfWP8Z8=
 github.com/go-sql-driver/mysql v1.4.0/go.mod h1:zAC/RDZ24gD3HViQzih4MyKcchzm+sOG5ZlKdlhCg5w=
 github.com/jmoiron/sqlx v1.2.0 h1:41Ip0zITnmWNR/vHV+S4m+VoUivnWY5E4OJfLZjCJMA=
 github.com/jmoiron/sqlx v1.2.0/go.mod h1:1FEQNm3xlJgrMD+FBdI9+xvCksHtbpVBBw5dYhBSsks=
