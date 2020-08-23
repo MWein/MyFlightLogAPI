@@ -106,7 +106,7 @@ func AddForeflightTrack(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Clean out any previous foreflight logs
-	database.DBConnection.Exec("DELETE FROM foreflight_test WHERE flightid = $1", flightId)
+	database.DBConnection.Exec("DELETE FROM foreflight WHERE flightid = $1", flightId)
 
 	var foreflightTrack [][2]float64
 
@@ -134,7 +134,7 @@ func AddForeflightTrack(w http.ResponseWriter, r *http.Request) {
 	}
 
 	foreflightTrackJSON, _ := json.Marshal(foreflightTrack)
-	database.DBConnection.Exec("INSERT INTO foreflight_test (flightid, data) VALUES ($1, $2)", flightId, foreflightTrackJSON)
+	database.DBConnection.Exec("INSERT INTO foreflight (flightid, data) VALUES ($1, $2)", flightId, foreflightTrackJSON)
 
 	fmt.Fprintf(w, "Saved")
 }
