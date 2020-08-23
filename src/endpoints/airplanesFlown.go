@@ -10,6 +10,7 @@ import (
 type Plane struct {
 	Ident      string `json:"ident"`
 	Type       string `json:"type"`
+	TypeLong   string `json:"typeLong"`
 	Flights    int    `json:"flights"`
 	LastFlight string `json:"lastFlight"`
 }
@@ -20,6 +21,7 @@ func AirplanesFlown(w http.ResponseWriter, r *http.Request) {
 	planeQuery := `SELECT
 		ident,
 		plane_type.name AS type,
+		plane_type.long_name AS type_long,
 		(SELECT count(*) FROM log WHERE log.ident = plane.ident) AS flights,
 		(SELECT date FROM log WHERE log.ident = plane.ident ORDER BY date DESC LIMIT 1) AS last_flight
 	FROM plane
@@ -31,7 +33,7 @@ func AirplanesFlown(w http.ResponseWriter, r *http.Request) {
 	var planes Planes
 	for rows.Next() {
 		var plane Plane
-		rows.Scan(&plane.Ident, &plane.Type, &plane.Flights, &plane.LastFlight)
+		rows.Scan(&plane.Ident, &plane.Type, &plane.TypeLong, &plane.Flights, &plane.LastFlight)
 
 		// Remove timestamp from date
 		if plane.LastFlight != "" {
