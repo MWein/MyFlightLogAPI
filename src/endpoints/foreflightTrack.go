@@ -16,19 +16,11 @@ func ForeflightTrack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows, err := database.DBConnection.Query("SELECT lat, long FROM foreflight WHERE flightid = $1 ORDER BY sequence", id[0])
-	if err != nil {
-		fmt.Fprintf(w, "Not Found")
-		return
-	}
+	var foreflightTrackBytes []byte
+	database.DBConnection.QueryRow("SELECT data FROM foreflight WHERE flightid = $1", id[0]).Scan(&foreflightTrackBytes)
 
 	var foreflightTrack [][2]float64
-	for rows.Next() {
-		var latLon [2]float64
-		rows.Scan(&latLon[0], &latLon[1])
-
-		foreflightTrack = append(foreflightTrack, latLon)
-	}
+	json.Unmarshal(foreflightTrackBytes, &foreflightTrack)
 
 	// Enable CORS
 	w.Header().Set("Access-Control-Allow-Origin", "*")

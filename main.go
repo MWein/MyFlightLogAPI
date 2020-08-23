@@ -14,6 +14,9 @@ func handleRequests() {
 	http.HandleFunc("/flight-image", endpoints.FlightImg)
 	http.HandleFunc("/foreflight-track", endpoints.ForeflightTrack)
 
+	// Upload Foreflight Track
+	http.HandleFunc("/add-foreflight-track", endpoints.AddForeflightTrack)
+
 	// Airplanes
 	http.HandleFunc("/plane-image", endpoints.PlaneImg)
 	http.HandleFunc("/airplanes-flown", endpoints.AirplanesFlown)
