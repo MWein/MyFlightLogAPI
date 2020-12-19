@@ -9,27 +9,28 @@ import (
 )
 
 type Log struct {
-	Id             string       `json:"id"`
-	Date           string       `json:"date"`
-	Type           string       `json:"type"`
-	Ident          string       `json:"ident"`
-	Stops          []string     `json:"stops"`
-	Night          float32      `json:"night"`
-	Instrument     float32      `json:"instrument"`
-	Sim_instrument float32      `json:"simInstrument"`
-	Flight_sim     float32      `json:"flightSim"`
-	Cross_country  float32      `json:"crossCountry"`
-	Instructor     float32      `json:"instructor"`
-	Dual           float32      `json:"dual"`
-	Pic            float32      `json:"pic"`
-	Total          float32      `json:"total"`
-	Takeoffs       int          `json:"takeoffs"`
-	Landings       int          `json:"landings"`
-	Remarks        string       `json:"remarks"`
-	Geolocation    [][2]float64 `json:"geolocation"`
-	Pictures       []string     `json:"pictures"`
-	HasFFTrack     bool         `json:"hasForeflightTrack"`
-	Favorite       bool         `json:"favorite"`
+	Id                   string       `json:"id"`
+	Date                 string       `json:"date"`
+	Type                 string       `json:"type"`
+	Ident                string       `json:"ident"`
+	Stops                []string     `json:"stops"`
+	InstrumentApproaches int          `json:"instrumentApproaches"`
+	Night                float32      `json:"night"`
+	Instrument           float32      `json:"instrument"`
+	Sim_instrument       float32      `json:"simInstrument"`
+	Flight_sim           float32      `json:"flightSim"`
+	Cross_country        float32      `json:"crossCountry"`
+	Instructor           float32      `json:"instructor"`
+	Dual                 float32      `json:"dual"`
+	Pic                  float32      `json:"pic"`
+	Total                float32      `json:"total"`
+	Takeoffs             int          `json:"takeoffs"`
+	Landings             int          `json:"landings"`
+	Remarks              string       `json:"remarks"`
+	Geolocation          [][2]float64 `json:"geolocation"`
+	Pictures             []string     `json:"pictures"`
+	HasFFTrack           bool         `json:"hasForeflightTrack"`
+	Favorite             bool         `json:"favorite"`
 }
 type Logs []Log
 
@@ -47,7 +48,7 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 	// Retrieve main logs body
 
 	logsStatement := `SELECT
-	id, date, plane_type.name AS type, ident, stops, night, instrument, sim_instrument, flight_sim, cross_country, instructor, dual, log.pic, total, takeoffs, landings, remarks, favorite
+	id, date, plane_type.name AS type, ident, stops, instrument_approaches, night, instrument, sim_instrument, flight_sim, cross_country, instructor, dual, log.pic, total, takeoffs, landings, remarks, favorite
 	FROM log
 	JOIN plane USING (ident)
 	JOIN plane_type USING (type_id)
@@ -58,7 +59,7 @@ func FlightLogs(w http.ResponseWriter, r *http.Request) {
 	var logs Logs
 	for rows.Next() {
 		var log Log
-		rows.Scan(&log.Id, &log.Date, &log.Type, &log.Ident, pq.Array(&log.Stops), &log.Night, &log.Instrument, &log.Sim_instrument, &log.Flight_sim, &log.Cross_country, &log.Instructor, &log.Dual, &log.Pic, &log.Total, &log.Takeoffs, &log.Landings, &log.Remarks, &log.Favorite)
+		rows.Scan(&log.Id, &log.Date, &log.Type, &log.Ident, pq.Array(&log.Stops), &log.InstrumentApproaches, &log.Night, &log.Instrument, &log.Sim_instrument, &log.Flight_sim, &log.Cross_country, &log.Instructor, &log.Dual, &log.Pic, &log.Total, &log.Takeoffs, &log.Landings, &log.Remarks, &log.Favorite)
 
 		// Remove timestamp from date
 		log.Date = log.Date[0:10]
