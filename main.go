@@ -30,6 +30,7 @@ func handleRequests() {
 	http.HandleFunc("/build-details", endpoints.BuildDetails)
 
 	// Currency Endpoints
+	http.HandleFunc("/flight-currency", endpoints.FlightCurrencyRequirements)
 	http.HandleFunc("/instrument-rating-progress", endpoints.InstrumentRatingProgress)
 
 	log.Fatal(http.ListenAndServe(":8081", nil))
