@@ -56,7 +56,7 @@ func InstrumentRatingProgress(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 3 hours instrument within last 2 calendar months
-	err = database.DBConnection.QueryRow("SELECT sum(sim_instrument) + sum(instrument) AS instrument, sum(sim_instrument) + sum(instrument) >= 3 AS met FROM log WHERE (sim_instrument > 0 OR instrument > 0) AND dual > 0 AND (extract(year from age(NOW()::date, date)) * 12 + extract(month from age(NOW()::date, date))) <= 2").Scan(&reqs.RecentInstrumentInstruction, &reqs.RecentInstrumentInstructionMet)
+	err = database.DBConnection.QueryRow("SELECT sum(sim_instrument) + sum(instrument) AS instrument, sum(sim_instrument) + sum(instrument) >= 3 AS met FROM log WHERE (sim_instrument > 0 OR instrument > 0) AND dual > 0 AND (extract(year from age(NOW()::date, date)) * 12 + extract(month from age(NOW()::date, date))) <= 1").Scan(&reqs.RecentInstrumentInstruction, &reqs.RecentInstrumentInstructionMet)
 	if err != nil {
 		fmt.Fprintf(w, "Error")
 		return
