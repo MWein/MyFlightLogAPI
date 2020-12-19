@@ -9,6 +9,7 @@ import (
 )
 
 type InstrumentRequirements struct {
+	InstrumentKnowledgeTest        bool    `json:"knowledgeTest"`
 	CrossCountryPilotInCommandMet  bool    `json:"ccPicMet"`
 	CrossCountryPilotInCommand     float64 `json:"ccPic"`
 	InstrumentHoursMet             bool    `json:"instrHoursMet"`
@@ -22,6 +23,9 @@ type InstrumentRequirements struct {
 
 func InstrumentRatingProgress(w http.ResponseWriter, r *http.Request) {
 	var reqs InstrumentRequirements
+
+	// TODO Uncomment once I pass the knowledge test. No sense in making a DB change just for this.
+	//reqs.InstrumentKnowledgeTest = true
 
 	// Cross country hours as PIC
 	err := database.DBConnection.QueryRow("SELECT sum(total), sum(total) >= 50 AS met FROM log WHERE cross_country > 0 AND pic > 0").Scan(&reqs.CrossCountryPilotInCommand, &reqs.CrossCountryPilotInCommandMet)
