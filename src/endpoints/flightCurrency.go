@@ -9,14 +9,15 @@ import (
 )
 
 type FlightCurrency struct {
-	VFRDay               bool `json:"vfrDay"`
-	VFRDayTO             int  `json:"vfrDayTO"`
-	VFRDayLandings       int  `json:"vfrDayLandings"`
-	VFRNight             bool `json:"vfrNight"`
-	VFRNightTO           int  `json:"vfrNightTO"`
-	VFRNightLandings     int  `json:"vfrNightLandings"`
-	Instrument           bool `json:"instrument"`
-	InstrumentApproaches int  `json:"instrumentApproaches"`
+	VFRDay               bool     `json:"vfrDay"`
+	VFRDayTO             int      `json:"vfrDayTO"`
+	VFRDayLandings       int      `json:"vfrDayLandings"`
+	VFRNight             bool     `json:"vfrNight"`
+	VFRNightTO           int      `json:"vfrNightTO"`
+	VFRNightLandings     int      `json:"vfrNightLandings"`
+	Instrument           bool     `json:"instrument"`
+	InstrumentApproaches int      `json:"instrumentApproaches"`
+	ApproachDates        []string `json:"lastApproaches"`
 }
 
 func FlightCurrencyRequirements(w http.ResponseWriter, r *http.Request) {
@@ -41,6 +42,24 @@ func FlightCurrencyRequirements(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintf(w, "Error")
 		return
+	}
+
+	// Last 6 instrument approaches
+	rows, _ := database.DBConnection.Query("SELECT date, instrument_approaches FROM log WHERE instrument_approaches > 0 ORDER BY date DESC LIMIT 6")
+	for rows.Next() {
+		var approachDate string
+		var number int
+		rows.Scan(&approachDate, &number)
+
+		// Remove timestamp from date
+		approachDate = approachDate[0:10]
+
+		// Add copies of approach dates for each number returned by the query
+		for i := 0; i < number; i++ {
+			if len(reqs.ApproachDates) < 6 {
+				reqs.ApproachDates = append(reqs.ApproachDates, approachDate)
+			}
+		}
 	}
 
 	// Enable CORS
