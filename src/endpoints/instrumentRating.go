@@ -9,16 +9,12 @@ import (
 )
 
 type InstrumentRequirements struct {
-	InstrumentKnowledgeTest        bool    `json:"knowledgeTest"`
-	CrossCountryPilotInCommandMet  bool    `json:"ccPicMet"`
-	CrossCountryPilotInCommand     float64 `json:"ccPic"`
-	InstrumentHoursMet             bool    `json:"instrHoursMet"`
-	InstrumentHours                float64 `json:"instrHours"`
-	InstrumentHoursWithCFIMet      bool    `json:"instrHoursWithCFIMet"`
-	InstrumentHoursWithCFI         float64 `json:"instrHoursWithCFI"`
-	LongCrossCountry               bool    `json:"longCC"`
-	RecentInstrumentInstructionMet bool    `json:"recentInstrInstructionMet"`
-	RecentInstrumentInstruction    float64 `json:"recentInstrInstruction"`
+	InstrumentKnowledgeTest     bool    `json:"knowledgeTest"`
+	CrossCountryPilotInCommand  float64 `json:"ccPic"`
+	InstrumentHours             float64 `json:"instrHours"`
+	InstrumentHoursWithCFI      float64 `json:"instrHoursWithCFI"`
+	LongCrossCountry            bool    `json:"longCC"`
+	RecentInstrumentInstruction float64 `json:"recentInstrInstruction"`
 }
 
 func InstrumentRatingProgress(w http.ResponseWriter, r *http.Request) {
@@ -28,21 +24,21 @@ func InstrumentRatingProgress(w http.ResponseWriter, r *http.Request) {
 	//reqs.InstrumentKnowledgeTest = true
 
 	// Cross country hours as PIC
-	err := database.DBConnection.QueryRow("SELECT sum(total), sum(total) >= 50 AS met FROM log WHERE cross_country > 0 AND pic > 0").Scan(&reqs.CrossCountryPilotInCommand, &reqs.CrossCountryPilotInCommandMet)
+	err := database.DBConnection.QueryRow("SELECT sum(total) FROM log WHERE cross_country > 0 AND pic > 0").Scan(&reqs.CrossCountryPilotInCommand)
 	if err != nil {
 		fmt.Fprintf(w, "Error")
 		return
 	}
 
 	// Total instrument time
-	err = database.DBConnection.QueryRow("SELECT sum(sim_instrument) + sum(instrument) AS instrument, (sum(sim_instrument) + sum(instrument)) >= 40 AS met FROM log").Scan(&reqs.InstrumentHours, &reqs.InstrumentHoursMet)
+	err = database.DBConnection.QueryRow("SELECT sum(sim_instrument) + sum(instrument) AS instrument FROM log").Scan(&reqs.InstrumentHours)
 	if err != nil {
 		fmt.Fprintf(w, "Error")
 		return
 	}
 
 	// Total instrument time with CFI
-	err = database.DBConnection.QueryRow("SELECT sum(sim_instrument) + sum(instrument) AS instrument, (sum(sim_instrument) + sum(instrument)) >= 40 AS met FROM log WHERE dual > 0").Scan(&reqs.InstrumentHoursWithCFI, &reqs.InstrumentHoursWithCFIMet)
+	err = database.DBConnection.QueryRow("SELECT sum(sim_instrument) + sum(instrument) AS instrument FROM log WHERE dual > 0").Scan(&reqs.InstrumentHoursWithCFI)
 	if err != nil {
 		fmt.Fprintf(w, "Error")
 		return
@@ -56,7 +52,7 @@ func InstrumentRatingProgress(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 3 hours instrument within last 2 calendar months
-	err = database.DBConnection.QueryRow("SELECT sum(sim_instrument) + sum(instrument) AS instrument, sum(sim_instrument) + sum(instrument) >= 3 AS met FROM log WHERE (sim_instrument > 0 OR instrument > 0) AND dual > 0 AND (extract(year from age(NOW()::date, date)) * 12 + extract(month from age(NOW()::date, date))) <= 1").Scan(&reqs.RecentInstrumentInstruction, &reqs.RecentInstrumentInstructionMet)
+	err = database.DBConnection.QueryRow("SELECT sum(sim_instrument) + sum(instrument) AS instrument FROM log WHERE (sim_instrument > 0 OR instrument > 0) AND dual > 0 AND (extract(year from age(NOW()::date, date)) * 12 + extract(month from age(NOW()::date, date))) <= 1").Scan(&reqs.RecentInstrumentInstruction)
 	if err != nil {
 		fmt.Fprintf(w, "Error")
 		return
