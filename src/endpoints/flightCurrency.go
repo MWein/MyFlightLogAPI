@@ -23,8 +23,8 @@ type FlightCurrency struct {
 func FlightCurrencyRequirements(w http.ResponseWriter, r *http.Request) {
 	var reqs FlightCurrency
 
-	// 3 VFR day takeoff and landings
-	err := database.DBConnection.QueryRow("SELECT sum(takeoffs) AS takeoffs, sum(landings) AS landings, (sum(takeoffs) >= 3 AND sum(landings) >= 3) AS met FROM log WHERE NOW()::date - date <= 90 AND night = 0").Scan(&reqs.VFRDayTO, &reqs.VFRDayLandings, &reqs.VFRDay)
+	// 3 VFR takeoff and landings (Day or night)
+	err := database.DBConnection.QueryRow("SELECT sum(takeoffs) AS takeoffs, sum(landings) AS landings, (sum(takeoffs) >= 3 AND sum(landings) >= 3) AS met FROM log WHERE NOW()::date - date <= 90").Scan(&reqs.VFRDayTO, &reqs.VFRDayLandings, &reqs.VFRDay)
 	if err != nil {
 		fmt.Fprintf(w, "Error")
 		return
