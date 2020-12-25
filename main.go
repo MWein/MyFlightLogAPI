@@ -28,6 +28,7 @@ func handleRequests() {
 	http.HandleFunc("/build-projects", endpoints.BuildProjects)
 	http.HandleFunc("/build-cover", endpoints.BuildCoverPhoto)
 	http.HandleFunc("/build-details", endpoints.BuildDetails)
+	http.HandleFunc("/build-photo", endpoints.BuildPhoto)
 
 	// Currency Endpoints
 	http.HandleFunc("/flight-currency", endpoints.FlightCurrencyRequirements)
