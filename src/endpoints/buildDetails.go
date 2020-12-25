@@ -63,17 +63,24 @@ func BuildDetails(w http.ResponseWriter, r *http.Request) {
 		rows.Scan(&phase.Id, &phase.Name, &phase.Complete)
 
 		// Get entries
-		rows, _ := database.DBConnection.Query(`SELECT title, date, minutes, rivets, description, (SELECT name FROM build_phase WHERE id = $1) AS phase FROM build_log WHERE phase_id = $1 ORDER BY date DESC`, phase.Id)
+		rows, _ := database.DBConnection.Query(`SELECT title, date, minutes, rivets, description, (SELECT name FROM build_phase WHERE id = $1) AS phase, id FROM build_log WHERE phase_id = $1 ORDER BY date DESC`, phase.Id)
 		phase.Entries = BuildEntries{}
 		for rows.Next() {
 			var entry BuildEntry
-			rows.Scan(&entry.Title, &entry.Date, &entry.Minutes, &entry.Rivets, &entry.Description, &entry.Phase)
+			var buildLogId string
+			rows.Scan(&entry.Title, &entry.Date, &entry.Minutes, &entry.Rivets, &entry.Description, &entry.Phase, &buildLogId)
 
 			// Remove timestamp from date
 			entry.Date = entry.Date[0:10]
 
-			// TODO Get pictures
+			// Get pictures
+			pictureIdRows, _ := database.DBConnection.Query(`SELECT id FROM build_log_picture WHERE buildlogid = $1`, buildLogId)
 			entry.Pictures = []string{}
+			for pictureIdRows.Next() {
+				var picId string
+				pictureIdRows.Scan(&picId)
+				entry.Pictures = append(entry.Pictures, picId)
+			}
 
 			phase.Entries = append(phase.Entries, entry)
 		}
