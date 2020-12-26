@@ -3,9 +3,13 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"time"
+
+	"github.com/patrickmn/go-cache"
 )
 
 var DBConnection *sql.DB
+var Cache *cache.Cache
 
 func StartDB() {
 	// Spin up the database connection
@@ -25,4 +29,8 @@ func StartDB() {
 	}
 
 	fmt.Println("Database Ready")
+
+	Cache = cache.New(5*time.Minute, 10*time.Minute)
+
+	fmt.Println("Cache Ready")
 }
