@@ -6,7 +6,6 @@ import (
 	"image"
 	"image/jpeg"
 	"net/http"
-	"time"
 
 	"github.com/MWein/MyFlightLogAPI/src/database"
 	"github.com/disintegration/imaging"
@@ -21,16 +20,11 @@ func BuildPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	start := time.Now()
-
 	// Get thumbnail image from cache if it exists
 	thumbnail, found := database.Cache.Get(id[0])
 	if found {
 		w.Header().Set("Content-Type", "image/jpeg")
 		w.Write(thumbnail.([]byte))
-
-		elapsed := time.Since(start)
-		fmt.Printf("%s\n", elapsed)
 
 		return
 	}
@@ -56,9 +50,6 @@ func BuildPhoto(w http.ResponseWriter, r *http.Request) {
 	bytes := buf.Bytes()
 
 	database.Cache.Set(id[0], bytes, cache.NoExpiration)
-
-	elapsed := time.Since(start)
-	fmt.Printf("%s\n", elapsed)
 
 	w.Header().Set("Content-Type", "image/jpeg")
 	w.Write(bytes)
