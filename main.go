@@ -11,14 +11,12 @@ import (
 func handleRequests() {
 	// Logbook
 	http.HandleFunc("/log", endpoints.FlightLogs)
-	http.HandleFunc("/flight-image", endpoints.FlightImg)
 	http.HandleFunc("/foreflight-track", endpoints.ForeflightTrack)
 
 	// Upload Foreflight Track
 	http.HandleFunc("/add-foreflight-track", endpoints.AddForeflightTrack)
 
 	// Airplanes
-	http.HandleFunc("/plane-image", endpoints.PlaneImg)
 	http.HandleFunc("/airplanes-flown", endpoints.AirplanesFlown)
 
 	// Airports
@@ -26,9 +24,7 @@ func handleRequests() {
 
 	// Build Log
 	http.HandleFunc("/build-projects", endpoints.BuildProjects)
-	http.HandleFunc("/build-cover", endpoints.BuildCoverPhoto)
 	http.HandleFunc("/build-details", endpoints.BuildDetails)
-	http.HandleFunc("/build-photo", endpoints.BuildPhoto)
 
 	// Currency Endpoints
 	http.HandleFunc("/flight-currency", endpoints.FlightCurrencyRequirements)
