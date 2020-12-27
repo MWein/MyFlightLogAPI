@@ -34,6 +34,9 @@ func handleRequests() {
 	http.HandleFunc("/flight-currency", endpoints.FlightCurrencyRequirements)
 	http.HandleFunc("/instrument-rating-progress", endpoints.InstrumentRatingProgress)
 
+	// Consolidated Image Endpoint
+	http.HandleFunc("/img", endpoints.Img)
+
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
 
