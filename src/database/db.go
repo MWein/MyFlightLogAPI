@@ -3,6 +3,7 @@ package database
 import (
 	"bytes"
 	"database/sql"
+	"errors"
 	"fmt"
 	"image"
 	"image/jpeg"
@@ -15,7 +16,7 @@ import (
 var DBConnection *sql.DB
 var Cache *cache.Cache
 
-func StartDB() {
+func StartDBAndCache() {
 	// Spin up the database connection
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -39,9 +40,28 @@ func StartDB() {
 	fmt.Println("Cache Ready")
 }
 
+func CreateThumbnails() {
+	fmt.Println("Creating Thumbnails")
+	const existingImageIDsCacheQuery = `SELECT id FROM pictures
+	UNION
+	SELECT id FROM build_log_picture
+	UNION
+	SELECT ident AS id FROM plane
+	UNION
+	SELECT id FROM build`
+
+	rows, _ := DBConnection.Query(existingImageIDsCacheQuery)
+	for rows.Next() {
+		var imageId string
+		rows.Scan(&imageId)
+
+		GetImage(imageId, true)
+	}
+}
+
 func GetImage(imageId string, thumbnail bool) ([]byte, error) {
 	// Check cache first if thumbnail
-	if (thumbnail) {
+	if thumbnail {
 		cachedThumbnail, found := Cache.Get(imageId)
 		if found {
 			return cachedThumbnail.([]byte), nil
@@ -70,6 +90,12 @@ func GetImage(imageId string, thumbnail bool) ([]byte, error) {
 
 	if !thumbnail {
 		return imageData, nil
+	}
+
+	if len(imageData) == 0 {
+		var emptyBytes []byte
+		err := errors.New("image is null")
+		return emptyBytes, err
 	}
 
 	// Create thumbnail image

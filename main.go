@@ -37,7 +37,12 @@ func handleRequests() {
 }
 
 func main() {
-	database.StartDB()
+	database.StartDBAndCache()
+
+	// Only initialize thumbnails if in prod because it takes forever when running locally
+	if !database.IsDevServer {
+		database.CreateThumbnails()
+	}
 
 	handleRequests()
 }
