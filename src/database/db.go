@@ -89,7 +89,17 @@ func GetImage(imageId string, thumbnail bool) ([]byte, error) {
 	}
 
 	if !thumbnail {
-		return imageData, nil
+		// Resize to 800 height (to match modal on UI)
+		// image.Image from bytes
+		img, _, _ := image.Decode(bytes.NewReader(imageData))
+		// Resize
+		dstImage := imaging.Resize(img, 0, 800, imaging.Lanczos)
+		// Back to []byte
+		buf := new(bytes.Buffer)
+		jpeg.Encode(buf, dstImage, nil)
+		bytes := buf.Bytes()
+
+		return bytes, nil
 	}
 
 	if len(imageData) == 0 {
