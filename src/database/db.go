@@ -88,6 +88,13 @@ func GetImage(imageId string, thumbnail bool) ([]byte, error) {
 		return emptyBytes, err
 	}
 
+	// If image is null, return error
+	if len(imageData) == 0 {
+		var emptyBytes []byte
+		err := errors.New("image is null")
+		return emptyBytes, err
+	}
+
 	if !thumbnail {
 		// Resize to 800 height (to match modal on UI)
 		// image.Image from bytes
@@ -100,12 +107,6 @@ func GetImage(imageId string, thumbnail bool) ([]byte, error) {
 		bytes := buf.Bytes()
 
 		return bytes, nil
-	}
-
-	if len(imageData) == 0 {
-		var emptyBytes []byte
-		err := errors.New("image is null")
-		return emptyBytes, err
 	}
 
 	// Create thumbnail image
