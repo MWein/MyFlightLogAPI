@@ -1,6 +1,8 @@
 package endpoints
 
 import (
+	"bytes"
+	"compress/gzip"
 	"fmt"
 	"net/http"
 
@@ -31,7 +33,15 @@ func Img(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	} else {
+		// Compress
+		buf := new(bytes.Buffer)
+		gzWriter, _ := gzip.NewWriterLevel(buf, gzip.BestCompression)
+		gzWriter.Write([]byte(image))
+		gzWriter.Close()
+		compressedImage := buf.Bytes()
+
 		w.Header().Set("Content-Type", "image/jpeg")
-		w.Write(image)
+		w.Header().Set("Content-Encoding", "gzip")
+		w.Write(compressedImage)
 	}
 }
